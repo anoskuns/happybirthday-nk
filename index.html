@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Happy birthday Ngọc Khánh </title>
+    
+    <link rel="icon" type="image/png" href="IMG/cake.png">
+
+    <!-- Google Fonts: Quicksand, Nunito, Comfortaa, Pacifico, Dancing Script -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700;800&family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js & OrbitControls 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Dữ liệu dự phòng (khi mở trực tiếp bằng file://) -->
+    <script src="loichuc.js"></script>
+    <script src="thiepmoi.js"></script>
+    <script src="anh_data.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #000000;
+            --pink-pastel: #ff8da1;
+            --pink-neon: #ff2a7a;
+            --red-heart: #ff4d4d;
+            --gold-glow: #ffd166;
+            --gold-rose: #e2a76f;
+            --white-soft: rgba(255, 255, 255, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-deep);
+            font-family: 'Quicksand', 'Nunito', 'Comfortaa', sans-serif;
+            color: #fff;
+        }
+
+        /* Canvas nền 3D */
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 1.8s ease;
+        }
+
+        #canvas-container.active {
+            opacity: 1;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        /* Bụi vàng ấm Golden Bokeh lấp lánh nền */
+        .bokeh-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .sparkle-dot {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff, var(--gold-glow) 60%, transparent 100%);
+            animation: floatSparkle linear infinite;
+            filter: drop-shadow(0 0 6px var(--gold-glow));
+        }
+
+        @keyframes floatSparkle {
+            0% {
+                transform: translateY(105vh) scale(0.3);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.9;
+            }
+            80% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* ================= THANH ĐIỀU KHIỂN GÓC TRÊN BÊN PHẢI ================= */
+        .top-right-group {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Nút thiệp mời bên trái nút âm thanh (chỉ hình icon to, không dùng chữ) */
+        .card-toggle-btn {
+            background: rgba(25, 8, 28, 0.85);
+            border: 1.5px solid rgba(255, 141, 161, 0.65);
+            color: #fff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 18px rgba(255, 42, 122, 0.5);
+            padding: 0;
+        }
+
+        .card-toggle-btn img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 141, 161, 0.95));
+            animation: pulseCardIcon 2.2s infinite ease-in-out;
+        }
+
+        @keyframes pulseCardIcon {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.12) rotate(-5deg); }
+        }
+
+        .card-toggle-btn:hover {
+            background: rgba(255, 42, 122, 0.45);
+            border-color: #ff2a7a;
+            box-shadow: 0 0 28px rgba(255, 42, 122, 0.9);
+            transform: scale(1.14);
+        }
+
+        .card-toggle-btn:active {
+            transform: scale(0.94);
+        }
+
+        /* Nút âm thanh tinh tế ở góc phải */
+        .audio-toggle-btn {
+            background: rgba(18, 5, 20, 0.8);
+            border: 1.5px solid rgba(255, 141, 161, 0.6);
+            color: #fff;
+            padding: 7px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 16px rgba(255, 42, 122, 0.45);
+        }
+
+        .audio-toggle-btn:hover {
+            background: rgba(255, 42, 122, 0.45);
+            border-color: #ff2a7a;
+            box-shadow: 0 0 22px rgba(255, 42, 122, 0.8);
+            transform: scale(1.06);
+        }
+
+        .audio-toggle-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Chung cho các màn hình chuyển cảnh */
+        .stage-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s ease;
+            background: radial-gradient(circle at center, #170014 0%, #050007 70%, #000000 100%);
+        }
+
+        .stage-screen.hidden {
+            opacity: 0;
+            transform: scale(1.08);
+            pointer-events: none;
+        }
+
+        /* ================= MÀN HÌNH 1: BÓ HOA & ĐỒNG HỒ ĐẾM NGƯỢC ================= */
+        .countdown-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 10px 22px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 141, 161, 0.25);
+            box-shadow: 0 0 25px rgba(255, 42, 122, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .countdown-unit {
+            text-align: center;
+            min-width: 48px;
+        }
+
+        .countdown-num {
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px var(--pink-neon);
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            color: var(--pink-pastel);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .countdown-sep {
+            font-size: 22px;
+            color: var(--pink-neon);
+            align-self: center;
+            margin-top: -8px;
+            font-weight: bold;
+        }
+
+        /* Bó hoa đặt chính giữa trục đối xứng */
+        .flower-wrapper {
+            position: relative;
+            width: clamp(260px, 45vw, 370px);
+            height: clamp(260px, 45vw, 370px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 35px rgba(255, 42, 122, 0.45));
+        }
+
+        .flower-wrapper:hover {
+            transform: scale(1.06) rotate(1deg);
+            filter: drop-shadow(0 0 50px rgba(255, 42, 122, 0.75));
+        }
+
+        .flower-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: breatheFlower 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes breatheFlower {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.03) translateY(-4px); }
+        }
+
+        .flower-halo {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 42, 122, 0.25) 0%, rgba(255, 209, 102, 0.15) 50%, transparent 70%);
+            z-index: -1;
+            animation: haloPulse 3s infinite alternate;
+        }
+
+        @keyframes haloPulse {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0.9; }
+        }
+
+        /* Dòng chữ mời chạm vào bó hoa */
+        .flower-hint {
+            margin-top: 25px;
+            font-size: clamp(15px, 2.5vw, 19px);
+            font-weight: 500;
+            color: var(--white-soft);
+            text-align: center;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: pulseHint 2s infinite ease-in-out;
+            cursor: pointer;
+            padding: 9px 24px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes pulseHint {
+            0%, 100% { transform: translateY(0); opacity: 0.85; }
+            50% { transform: translateY(-4px); opacity: 1; color: #fff; }
+        }
+
+        /* ================= MÀN HÌNH 2: BÁNH KEM TỪ ẢNH bk remove.png & THỔI NẾN ================= */
+        .stage-title {
+            font-family: 'Pacifico', cursive;
+            font-size: clamp(26px, 5vw, 42px);
+            color: var(--pink-pastel);
+            text-shadow: 0 0 15px var(--pink-neon), 0 0 35px var(--pink-neon);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .cake-wrapper-photo {
+            position: relative;
+            width: clamp(260px, 42vw, 360px);
+            height: clamp(240px, 40vw, 330px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 30px rgba(255, 42, 122, 0.4));
+        }
+
+        .cake-wrapper-photo:hover {
+            transform: scale(1.06);
+            filter: drop-shadow(0 0 45px rgba(255, 42, 122, 0.7));
+        }
+
+        .cake-real-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: breatheFlower 3.5s ease-in-out infinite alternate;
+        }
+
+        /* Nến cắm trên đỉnh bánh kem */
+        .candle-holder {
+            position: absolute;
+            top: 14%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .candle-stick {
+            width: 14px;
+            height: 48px;
+            background: repeating-linear-gradient(45deg, #fff, #fff 5px, #ff3366 5px, #ff3366 10px);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .candle-flame {
+            width: 18px;
+            height: 32px;
+            margin-bottom: -2px;
+            background: radial-gradient(ellipse at bottom, #fff 0%, #ffeb3b 45%, #ff5722 80%, transparent 100%);
+            border-radius: 50% 50% 25% 25%;
+            filter: drop-shadow(0 0 14px #ff9800) drop-shadow(0 0 28px #ff5722);
+            animation: flameFlicker 0.12s infinite alternate ease-in-out;
+            transform-origin: center bottom;
+        }
+
+        @keyframes flameFlicker {
+            0%   { transform: scale(1) rotate(-3deg); }
+            100% { transform: scale(1.12, 1.18) rotate(3deg); }
+        }
+
+        .candle-flame.extinguished {
+            animation: blowOutFlame 0.4s forwards ease-out;
+        }
+
+        @keyframes blowOutFlame {
+            0%   { transform: scale(1); opacity: 1; }
+            40%  { transform: scale(1.4, 0.3); opacity: 0.6; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .candle-hint {
+            font-size: clamp(14px, 2vw, 17px);
+            color: var(--white-soft);
+            text-align: center;
+            max-width: 85%;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .btn-blow {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(45deg, #ff2a7a, #ff7597);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 42, 122, 0.6);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-blow:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 30px rgba(255, 42, 122, 0.8);
+        }
+
+        /* Hiệu ứng chớp tối phòng khi nến tắt */
+        #blackout-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Pháo hoa nổ */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 95;
+            pointer-events: none;
+        }
+
+        /* ================= POPUP THIỆP MỜI SANG TRỌNG ================= */
+        .card-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        .card-modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .card-modal-box {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            background: linear-gradient(135deg, #1f071e 0%, #120215 100%);
+            border: 2px solid var(--gold-rose);
+            border-radius: 20px;
+            padding: 35px 28px 25px;
+            box-shadow: 0 0 45px rgba(226, 167, 111, 0.35), 0 0 30px rgba(255, 42, 122, 0.3);
+            color: #fff;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-modal-overlay.open .card-modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .card-close-btn {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 141, 161, 0.4);
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card-close-btn:hover {
+            background: var(--pink-neon);
+            transform: rotate(90deg);
+        }
+
+        .card-header-icon {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .card-header-icon img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(255, 141, 161, 0.8));
+        }
+
+        .card-letter-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(24px, 4vw, 32px);
+            text-align: center;
+            color: var(--gold-glow);
+            text-shadow: 0 0 12px rgba(255, 209, 102, 0.6);
+            margin-bottom: 6px;
+        }
+
+        .card-divider {
+            width: 60%;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, var(--gold-rose), transparent);
+            margin: 0 auto 18px;
+        }
+
+        .card-letter-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #ffeff5;
+            overflow-y: auto;
+            padding: 5px 12px;
+            white-space: pre-line;
+            scrollbar-width: thin;
+            scrollbar-color: var(--pink-neon) transparent;
+        }
+
+        .card-letter-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .card-letter-body::-webkit-scrollbar-thumb {
+            background: var(--pink-neon);
+            border-radius: 10px;
+        }
+
+        .card-footer-stamp {
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(226, 167, 111, 0.3);
+            text-align: right;
+            font-family: 'Dancing Script', cursive;
+            font-size: 18px;
+            color: var(--gold-rose);
+        }
+
+        /* Màn hình 3: HUD hướng dẫn vuốt */
+        .universe-hud {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            background: rgba(10, 2, 15, 0.55);
+            padding: 9px 24px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--pink-pastel);
+            border: 1px solid rgba(255, 42, 122, 0.35);
+            pointer-events: none;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(255, 42, 122, 0.2);
+            animation: pulseUniverseHud 2.5s infinite ease-in-out;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+
+        .universe-hud.visible {
+            opacity: 1;
+        }
+
+        @keyframes pulseUniverseHud {
+            0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.03); color: #fff; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================================================================= -->
+    <!-- 🎵 NƠI CHÈN ĐƯỜNG LINK NHẠC BẰNG src:                             -->
+    <!-- Bạn chỉ cần thay đổi đường link hoặc tên file vào thuộc tính src: -->
+    <!-- Ví dụ: src="music.mp3" HOẶC src="https://example.com/baihat.mp3"   -->
+    <!-- ================================================================= -->
+    <audio id="bgAudio" loop preload="auto" src="music.mp4"></audio>
+
+    <!-- THANH CÔNG CỤ GÓC PHẢI TRÊN CÙNG -->
+    <div class="top-right-group" size = "medium" >
+        <!-- NÚT THIỆP MỜI BÊN TRÁI NÚT ÂM THANH (CHỈ ICON TO RÕ NÉT) -->
+        <button id="openCardBtn" class="card-toggle-btn" title="Mở thiệp chúc mừng 💌">
+            <img src="IMG/thi%E1%BB%87p%20rvbck.png" onerror="this.onerror=null; this.src='IMG/card.png';" alt="Thiệp mời">
+        </button>
+
+        <!-- NÚT BẬT/TẮT ÂM THANH -->
+        <button id="toggleAudioBtn" class="audio-toggle-btn" title="Bật/Tắt âm thanh">
+            🔊 Âm thanh
+        </button>
+    </div>
+
+    <!-- POPUP THIỆP MỜI SANG TRỌNG -->
+    <div id="invitationPopup" class="card-modal-overlay">
+        <div class="card-modal-box">
+            <button class="card-close-btn" id="closeCardBtn" title="Đóng thiệp">✕</button>
+            <div class="card-header-icon">
+                <img src="IMG/thi%E1%BB%87p%20rvbck.png" onerror="this.onerror=null; this.src='IMG/card.png';" alt="Thiệp mời">
+            </div>
+            <h3 class="card-letter-title">💌 CHÚC NGỌC KHÁNH SINH NHẬT VUII VẺ NHA 💌</h3>
+            <div class="card-divider"></div>
+            <div class="card-letter-body" id="cardLetterContent">
+                <!-- Nội dung được đọc tự động từ thiepmoi.js -->
+            </div>
+            <div class="card-footer-stamp">
+                <span>With all my heart ❤️</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- BỤI SÁNG VÀNG ẤM GOLDEN BOKEH -->
+    <div class="bokeh-container" id="bokehContainer"></div>
+
+    <!-- MÀN HÌNH 1: BÓ HOA & ĐỒNG HỒ ĐẾM NGƯỢC -->
+    <div class="stage-screen" id="screen1">
+        <div class="countdown-box">
+            <div class="countdown-unit">
+                <div class="countdown-num" id="cdDays">00</div>
+                <div class="countdown-label">Ngày</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+                <div class="countdown-num" id="cdHours">00</div>
+                <div class="countdown-label">Giờ</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+                <div class="countdown-num" id="cdMins">00</div>
+                <div class="countdown-label">Phút</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+                <div class="countdown-num" id="cdSecs">00</div>
+                <div class="countdown-label">Giây</div>
+            </div>
+        </div>
+
+        <div class="flower-wrapper" id="flowerTarget" title="Chạm vào bó hoa để mở quà!">
+            <div class="flower-halo"></div>
+            <img class="flower-img" id="flowerImg" src="IMG/hoa%20h%C6%B0%E1%BB%9Bng%20d%C6%B0%C6%A1ng.png" alt="Bó hoa xinh đẹp" onerror="this.onerror=null; this.src='IMG/flower.png';">
+        </div>
+
+        <div class="flower-hint" id="flowerHintBtn">
+            <span>✨ Chạm vào bó hoa ✨</span>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 2: BÁNH KEM TỪ ẢNH THỰC TẾ bk remove.png & THỔI NẾN -->
+    <div class="stage-screen hidden" id="screen2">
+        <h2 class="stage-title">🎂 Ước một điều ước nè 🎂</h2>
+
+        <!-- Bánh kem sử dụng ảnh bk remove.png với ngọn nến lung linh -->
+        <div class="cake-wrapper-photo" id="cakeClickArea" title="Chạm vào ngọn nến để thổi tắt!">
+            <img class="cake-real-img" src="IMG/bk%20remove.png" onerror="this.onerror=null; this.src='IMG/cake.png';" alt="Bánh kem sinh nhật">
+            <!-- Ngọn nến cắm trên đỉnh bánh kem -->
+            <div class="candle-holder">
+                <div class="candle-flame" id="flameElement"></div>
+                <div class="candle-stick"></div>
+            </div>
+        </div>
+
+        <p class="candle-hint">
+            Nhắm mắt lại, ước một điều thật tuyệt vời<br>và chạm vào ngọn nến để thổi nến nghen!
+        </p>
+
+        <button class="btn-blow" id="blowBtn">
+            <span>Thổi Nến Đii </span>
+        </button>
+    </div>
+
+    <!-- HIỆU ỨNG TỐI PHÒNG KHI TẮT NẾN -->
+    <div id="blackout-overlay"></div>
+
+    <!-- CANVAS PHÁO HOA NỔ BÙNG NỔ -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- MÀN HÌNH 3: KHÔNG GIAN VŨ TRỤ 3D & CHỮ NEON BAY LÊN -->
+    <div id="canvas-container"></div>
+    <div class="universe-hud" id="universeHud">
+    </div>
+
+    <script>
+        // ==============================================================
+        // 1. TẠO HẠT BỤI VÀNG ẤM (GOLDEN BOKEH SPARKLES)
+        // ==============================================================
+        const bokehContainer = document.getElementById('bokehContainer');
+        const BOKEH_COUNT = 45;
+
+        for (let i = 0; i < BOKEH_COUNT; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'sparkle-dot';
+            const size = 3 + Math.random() * 6;
+            dot.style.width = size + 'px';
+            dot.style.height = size + 'px';
+            dot.style.left = Math.random() * 100 + '%';
+            dot.style.animationDuration = (8 + Math.random() * 12) + 's';
+            dot.style.animationDelay = (Math.random() * 8) + 's';
+            bokehContainer.appendChild(dot);
+        }
+
+        // ==============================================================
+        // 2. ĐỒNG HỒ ĐẾM NGƯỢC (COUNTDOWN TO 00:00 SINH NHẬT)
+        // ==============================================================
+        const cdDays = document.getElementById('cdDays');
+        const cdHours = document.getElementById('cdHours');
+        const cdMins = document.getElementById('cdMins');
+        const cdSecs = document.getElementById('cdSecs');
+
+        function getTargetBirthday() {
+            const now = new Date();
+            const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+            if (target.getTime() <= now.getTime()) {
+                target.setDate(target.getDate() + 1);
+                target.setHours(0, 0, 0, 0);
+            }
+            return target;
+        }
+
+        const targetTime = getTargetBirthday();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = targetTime.getTime() - now;
+
+            if (diff <= 0) {
+                cdDays.textContent = "00";
+                cdHours.textContent = "00";
+                cdMins.textContent = "00";
+                cdSecs.textContent = "00";
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            cdDays.textContent = String(d).padStart(2, '0');
+            cdHours.textContent = String(h).padStart(2, '0');
+            cdMins.textContent = String(m).padStart(2, '0');
+            cdSecs.textContent = String(s).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ==============================================================
+        // 3. XỬ LÝ POPUP THIỆP MỜI (SỬ DỤNG TRỰC TIẾP TỪ thiepmoi.js)
+        // ==============================================================
+        const openCardBtn = document.getElementById('openCardBtn');
+        const closeCardBtn = document.getElementById('closeCardBtn');
+        const invitationPopup = document.getElementById('invitationPopup');
+        const cardLetterContent = document.getElementById('cardLetterContent');
+
+        // Lấy trực tiếp nội dung bức thư từ thiepmoi.js
+        const letterText = window.DEFAULT_LETTER || "Chúc bạn một ngày sinh nhật ngập tràn niềm vui và hạnh phúc!";
+        cardLetterContent.textContent = letterText;
+
+        openCardBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            invitationPopup.classList.add('open');
+        });
+
+        closeCardBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            invitationPopup.classList.remove('open');
+        });
+
+        invitationPopup.addEventListener('click', function(e) {
+            if (e.target === invitationPopup) {
+                invitationPopup.classList.remove('open');
+            }
+        });
+
+        // ==============================================================
+        // 4. DANH SÁCH LỜI CHÚC (SỬ DỤNG TRỰC TIẾP TỪ loichuc.js)
+        // ==============================================================
+        let wishes = (window.DEFAULT_WISHES && Array.isArray(window.DEFAULT_WISHES) && window.DEFAULT_WISHES.length > 0)
+            ? window.DEFAULT_WISHES
+            : [
+                "Chúc mừng sinh nhật! 🎂",
+                "Happy Birthday! Tuổi mới vạn điều như ý 🎉",
+                "Mong nụ cười luôn rạng rỡ trên môi bạn ✨"
+            ];
+
+        // ==============================================================
+        // 5. HỆ THỐNG ÂM THANH (BẬT / TẮT CHUẨN XÁC 100%)
+        // ==============================================================
+        const bgAudio = document.getElementById('bgAudio');
+        const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+
+        let isAudioMuted = false;
+        let isAudioStarted = false;
+        let audioCtx = null;
+        let synthMasterGain = null;
+        let synthTimeout = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                synthMasterGain = audioCtx.createGain();
+                synthMasterGain.gain.value = 1;
+                synthMasterGain.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended' && !isAudioMuted) {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function muteAllAudio() {
+            isAudioMuted = true;
+            try { bgAudio.pause(); } catch(e){}
+
+            if (synthTimeout) {
+                clearTimeout(synthTimeout);
+                synthTimeout = null;
+            }
+            if (synthMasterGain && audioCtx) {
+                synthMasterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            }
+            if (audioCtx && audioCtx.state === 'running') {
+                try { audioCtx.suspend(); } catch(e){}
+            }
+
+            toggleAudioBtn.innerHTML = '🔇 Đã tắt';
+            toggleAudioBtn.style.opacity = '0.7';
+        }
+
+        function unmuteAllAudio() {
+            isAudioMuted = false;
+            isAudioStarted = true;
+
+            const ctx = getAudioContext();
+            if (ctx && ctx.state === 'suspended') {
+                ctx.resume();
+            }
+            if (synthMasterGain && ctx) {
+                synthMasterGain.gain.setValueAtTime(1, ctx.currentTime);
+            }
+
+            toggleAudioBtn.innerHTML = '🔊 Đang phát';
+            toggleAudioBtn.style.opacity = '1';
+
+            if (bgAudio.src && !bgAudio.src.endsWith('/') && !bgAudio.src.endsWith('undefined')) {
+                const p = bgAudio.play();
+                if (p !== undefined) {
+                    p.then(() => {
+                        // Phát thành công qua thẻ <audio>
+                    }).catch(() => {
+                        if (!isAudioMuted) playPianoSynth();
+                    });
+                }
+            } else {
+                playPianoSynth();
+            }
+        }
+
+        toggleAudioBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (!isAudioStarted) {
+                unmuteAllAudio();
+            } else if (isAudioMuted) {
+                unmuteAllAudio();
+            } else {
+                muteAllAudio();
+            }
+        });
+
+        // Tiếng gió thổi nến
+        function playBlowSound() {
+            try {
+                const ctx = getAudioContext();
+                const bufferSize = ctx.sampleRate * 0.4;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.12));
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(600, ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.35);
+
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.38);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                noise.start();
+            } catch(e){}
+        }
+
+        // Tiếng nổ pháo hoa "Bùm"
+        function playFireworkBoom() {
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(140, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.6);
+
+                gain.gain.setValueAtTime(0.8, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.7);
+            } catch(e){}
+        }
+
+        // Nhạc dự phòng Synthesizer
+        function getHappyBirthdayNotes() {
+            const C4 = 261.63, D4 = 293.66, E4 = 329.63, F4 = 349.23;
+            const G4 = 392.00, A4 = 440.00, Bb4 = 466.16, C5 = 523.25;
+            const q = 0.44, h = 0.88, e = 0.23;
+            return [
+                [C4, e], [C4, e], [D4, q], [C4, q], [F4, q], [E4, h],
+                [C4, e], [C4, e], [D4, q], [C4, q], [G4, q], [F4, h],
+                [C4, e], [C4, e], [C5, q], [A4, q], [F4, q], [E4, q], [D4, h],
+                [Bb4, e], [Bb4, e], [A4, q], [F4, q], [G4, q], [F4, h]
+            ];
+        }
+
+        function playPianoSynth() {
+            if (isAudioMuted) return;
+            const ctx = getAudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+            if (synthMasterGain) synthMasterGain.gain.setValueAtTime(1, ctx.currentTime);
+
+            const notes = getHappyBirthdayNotes();
+            let time = ctx.currentTime + 0.1;
+            const gap = 0.05;
+
+            notes.forEach(([freq, dur]) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, time);
+
+                gain.gain.setValueAtTime(0.001, time);
+                gain.gain.exponentialRampToValueAtTime(0.28, time + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0001, time + dur + 0.2);
+
+                osc.connect(gain);
+                gain.connect(synthMasterGain);
+                osc.start(time);
+                osc.stop(time + dur + 0.25);
+
+                const chime = ctx.createOscillator();
+                const cGain = ctx.createGain();
+                chime.type = 'sine';
+                chime.frequency.setValueAtTime(freq * 2, time);
+                cGain.gain.setValueAtTime(0.001, time);
+                cGain.gain.exponentialRampToValueAtTime(0.07, time + 0.02);
+                cGain.gain.exponentialRampToValueAtTime(0.0001, time + dur * 0.6);
+
+                chime.connect(cGain);
+                cGain.connect(synthMasterGain);
+                chime.start(time);
+                chime.stop(time + dur);
+
+                time += dur + gap;
+            });
+
+            const total = notes.reduce((s, [, d]) => s + d + gap, 0);
+            synthTimeout = setTimeout(() => {
+                if (!isAudioMuted && bgAudio.paused) {
+                    playPianoSynth();
+                }
+            }, total * 1000 + 800);
+        }
+
+        function startMainMusic() {
+            if (!isAudioMuted) unmuteAllAudio();
+        }
+
+        // ==============================================================
+        // 6. KỊCH BẢN CHUYỂN CẢNH (3 GIAI ĐOẠN)
+        // ==============================================================
+        const screen1 = document.getElementById('screen1');
+        const screen2 = document.getElementById('screen2');
+        const flowerTarget = document.getElementById('flowerTarget');
+        const flowerHintBtn = document.getElementById('flowerHintBtn');
+        const cakeClickArea = document.getElementById('cakeClickArea');
+        const blowBtn = document.getElementById('blowBtn');
+        const flameElement = document.getElementById('flameElement');
+        const blackout = document.getElementById('blackout-overlay');
+        const canvasContainer = document.getElementById('canvas-container');
+        const universeHud = document.getElementById('universeHud');
+
+        function goToScreen2() {
+            screen1.classList.add('hidden');
+            setTimeout(() => {
+                screen1.style.display = 'none';
+                screen2.classList.remove('hidden');
+            }, 800);
+        }
+
+        flowerTarget.addEventListener('click', goToScreen2);
+        flowerHintBtn.addEventListener('click', goToScreen2);
+
+        let isBlown = false;
+        function blowCandle() {
+            if (isBlown) return;
+            isBlown = true;
+
+            playBlowSound();
+            flameElement.classList.add('extinguished');
+
+            setTimeout(() => {
+                blackout.style.opacity = '1';
+
+                setTimeout(() => {
+                    playFireworkBoom();
+                    startMainMusic();
+                    triggerFireworksBurst();
+
+                    blackout.style.opacity = '0';
+                    screen2.classList.add('hidden');
+
+                    setTimeout(() => {
+                        screen2.style.display = 'none';
+                        blackout.style.display = 'none';
+                        canvasContainer.classList.add('active');
+                        universeHud.classList.add('visible');
+                    }, 800);
+                }, 450);
+            }, 500);
+        }
+
+        cakeClickArea.addEventListener('click', blowCandle);
+        blowBtn.addEventListener('click', blowCandle);
+
+        // ==============================================================
+        // 7. PHÁO HOA CANVAS
+        // ==============================================================
+        const fwCanvas = document.getElementById('fireworks-canvas');
+        const fwCtx = fwCanvas.getContext('2d');
+        let fwParticles = [];
+
+        function resizeFw() {
+            fwCanvas.width = window.innerWidth;
+            fwCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeFw);
+        resizeFw();
+
+        function triggerFireworksBurst() {
+            const colors = ['#ff2a7a', '#ffd166', '#ff8da1', '#ff4d4d', '#ffffff', '#00f0ff'];
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            for (let b = 0; b < 3; b++) {
+                setTimeout(() => {
+                    playFireworkBoom();
+                    const ox = centerX + (Math.random() - 0.5) * window.innerWidth * 0.5;
+                    const oy = centerY + (Math.random() - 0.5) * window.innerHeight * 0.4;
+                    for (let i = 0; i < 90; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 2 + Math.random() * 8;
+                        fwParticles.push({
+                            x: ox,
+                            y: oy,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            color: colors[Math.floor(Math.random() * colors.length)],
+                            alpha: 1,
+                            decay: 0.015 + Math.random() * 0.015,
+                            size: 2.5 + Math.random() * 3
+                        });
+                    }
+                }, b * 260);
+            }
+        }
+
+        function renderFireworks() {
+            fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+            for (let i = fwParticles.length - 1; i >= 0; i--) {
+                const p = fwParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.07;
+                p.alpha -= p.decay;
+
+                if (p.alpha <= 0) {
+                    fwParticles.splice(i, 1);
+                    continue;
+                }
+
+                fwCtx.save();
+                fwCtx.globalAlpha = p.alpha;
+                fwCtx.fillStyle = p.color;
+                fwCtx.shadowColor = p.color;
+                fwCtx.shadowBlur = 8;
+                fwCtx.beginPath();
+                fwCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                fwCtx.fill();
+                fwCtx.restore();
+            }
+            requestAnimationFrame(renderFireworks);
+        }
+        renderFireworks();
+
+        // ==============================================================
+        // 8. VŨ TRỤ 3D & THUẬT TOÁN VẼ CHỮ 1 DÒNG DÀI
+        // ==============================================================
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.0011);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 3500);
+        camera.position.set(0, 40, 480);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        canvasContainer.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.rotateSpeed = 0.8;
+        controls.enableZoom = true;
+        controls.minDistance = 160;
+        controls.maxDistance = 900;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.32;
+
+        const starCount = 2000;
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(starCount * 3);
+        const starColors = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount; i++) {
+            const i3 = i * 3;
+            starPos[i3]     = (Math.random() - 0.5) * 2400;
+            starPos[i3 + 1] = (Math.random() - 0.5) * 2400;
+            starPos[i3 + 2] = (Math.random() - 0.5) * 2400;
+
+            if (Math.random() > 0.8) {
+                starColors[i3] = 1.0; starColors[i3+1] = 0.82; starColors[i3+2] = 0.4;
+            } else {
+                starColors[i3] = 1.0; starColors[i3+1] = 0.6 + Math.random()*0.4; starColors[i3+2] = 0.75 + Math.random()*0.25;
+            }
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+        function getStarTexture() {
+            const c = document.createElement('canvas');
+            c.width = 64; c.height = 64;
+            const ctx = c.getContext('2d');
+            const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            g.addColorStop(0, 'rgba(255,255,255,1)');
+            g.addColorStop(0.35, 'rgba(255,209,102,0.8)');
+            g.addColorStop(1, 'rgba(255,42,122,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(32, 32, 32, 0, Math.PI * 2);
+            ctx.fill();
+            return new THREE.CanvasTexture(c);
+        }
+
+        const starMat = new THREE.PointsMaterial({
+            size: 8,
+            vertexColors: true,
+            map: getStarTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const starPoints = new THREE.Points(starGeo, starMat);
+        scene.add(starPoints);
+
+        // Thuật toán vẽ chữ 1 dòng dài duy nhất
+        function makeNeonWishData(text) {
+            const line = text;
+
+            const measureCanvas = document.createElement('canvas');
+            const mCtx = measureCanvas.getContext('2d');
+            const fontSize = 48;
+            const fontName = 'bold 48px "Quicksand", "Nunito", "Comfortaa", sans-serif';
+            mCtx.font = fontName;
+
+            const textWidth = Math.ceil(mCtx.measureText(line).width);
+            const paddingX = 90;
+            const paddingY = 40;
+
+            const canvasWidth = textWidth + paddingX * 2;
+            const canvasHeight = fontSize + paddingY * 2;
+
+            const c = document.createElement('canvas');
+            c.width = canvasWidth;
+            c.height = canvasHeight;
+            const ctx = c.getContext('2d');
+
+            ctx.font = fontName;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const cx = c.width / 2;
+            const cy = c.height / 2;
+
+            // 1. Viền ngoài Neon Glow đậm (#ff2a7a)
+            ctx.shadowColor = '#ff2a7a';
+            ctx.shadowBlur = 20;
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = '#ff8da1';
+            ctx.strokeText(line, cx, cy);
+
+            // 2. Viền ngoài phụ đỏ cam (#ff4d4d)
+            ctx.shadowColor = '#ff4d4d';
+            ctx.shadowBlur = 28;
+            ctx.strokeText(line, cx, cy);
+
+            // 3. Ruột chữ màu trắng ngọc phát sáng
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(line, cx, cy);
+
+            const tex = new THREE.CanvasTexture(c);
+            tex.needsUpdate = true;
+
+            const baseHeight = 18 + Math.random() * 11;
+            const scaleY = baseHeight;
+            const scaleX = (canvasWidth / canvasHeight) * scaleY;
+
+            return {
+                texture: tex,
+                scaleX: scaleX,
+                scaleY: scaleY
+            };
+        }
+
+        // ==============================================================
+        // ⚡ BẢNG ĐIỀU CHỈNH TỐC ĐỘ VÀ MẬT ĐỘ (BẠN CHỈNH TẠI ĐÂY)
+        // ==============================================================
+        const WISH_FLY_SPEED = 1.2;         // Tốc độ bay của CHỮ (Mặc định 0.55. Giảm xuống 0.25 - 0.35 nếu muốn bay chậm dễ đọc, tăng lên 0.8 - 1.2 nếu muốn nhanh)
+        const PHOTO_FLY_SPEED = 0.55;        // Tốc độ bay của ẢNH Polaroid
+        const HEART_FLY_SPEED = 0.80;        // Tốc độ bay của TRÁI TIM
+        const TOTAL_WISHES_IN_SPACE = 60;    // Số lượng câu chữ cùng xuất hiện trong không gian 3D (mật độ chữ)
+        const Y_MIN = -380;
+        const Y_MAX = 460;
+
+        let wishSprites = [];
+
+        function rebuild3DWishes() {
+            wishSprites.forEach(w => scene.remove(w.sprite));
+            wishSprites = [];
+
+            for (let i = 0; i < TOTAL_WISHES_IN_SPACE; i++) {
+                const text = wishes[i % wishes.length];
+                const data = makeNeonWishData(text);
+
+                const mat = new THREE.SpriteMaterial({
+                    map: data.texture,
+                    transparent: true,
+                    opacity: 0.95,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false
+                });
+
+                const sprite = new THREE.Sprite(mat);
+                sprite.scale.set(data.scaleX, data.scaleY, 1);
+
+                const radius = 170 + Math.random() * 280;
+                const angle = Math.random() * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                const y = Y_MIN + (i / TOTAL_WISHES_IN_SPACE) * (Y_MAX - Y_MIN) + (Math.random() * 30);
+
+                sprite.position.set(x, y, z);
+                scene.add(sprite);
+
+                wishSprites.push({
+                    sprite: sprite,
+                    speed: (0.8 + Math.random() * 0.4) * WISH_FLY_SPEED,
+                    swayDist: 12 + Math.random() * 24,
+                    baseX: x,
+                    baseZ: z,
+                    index: i % wishes.length
+                });
+            }
+        }
+
+        if (document.fonts) {
+            document.fonts.ready.then(() => rebuild3DWishes());
+        } else {
+            rebuild3DWishes();
+        }
+
+        // Trái tim 3D
+        function makeHeartTexture() {
+            const c = document.createElement('canvas');
+            c.width = 128; c.height = 128;
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, 128, 128);
+
+            ctx.fillStyle = '#ff2a7a';
+            ctx.shadowColor = '#ff4d4d';
+            ctx.shadowBlur = 18;
+
+            ctx.beginPath();
+            ctx.moveTo(64, 38);
+            ctx.bezierCurveTo(64, 25, 48, 12, 30, 12);
+            ctx.bezierCurveTo(12, 12, 12, 36, 12, 48);
+            ctx.bezierCurveTo(12, 70, 36, 92, 64, 114);
+            ctx.bezierCurveTo(92, 92, 116, 70, 116, 48);
+            ctx.bezierCurveTo(116, 36, 116, 12, 98, 12);
+            ctx.bezierCurveTo(80, 12, 64, 25, 64, 38);
+            ctx.closePath();
+            ctx.fill();
+
+            return new THREE.CanvasTexture(c);
+        }
+
+        const heartTex = makeHeartTexture();
+        const heartCount = 60;
+        const heartList = [];
+
+        for (let i = 0; i < heartCount; i++) {
+            const mat = new THREE.SpriteMaterial({
+                map: heartTex,
+                transparent: true,
+                opacity: 0.85,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            const sprite = new THREE.Sprite(mat);
+            const sz = 10 + Math.random() * 22;
+            sprite.scale.set(sz, sz, 1);
+
+            const r = 90 + Math.random() * 370;
+            const th = Math.random() * Math.PI * 2;
+            const x = Math.cos(th) * r;
+            const z = Math.sin(th) * r;
+            const y = Y_MIN + Math.random() * (Y_MAX - Y_MIN);
+
+            sprite.position.set(x, y, z);
+            scene.add(sprite);
+
+            heartList.push({
+                sprite: sprite,
+                speed: (0.8 + Math.random() * 0.4) * HEART_FLY_SPEED,
+                radius: r
+            });
+        }
+
+        // ==============================================================
+        // 📸 DANH SÁCH ẢNH BAY BỒNG BỀNH TRONG VŨ TRỤ 3D
+        // Đã nhận diện 5 ảnh thật của bạn trong thư mục IMG:
+        // ==============================================================
+        const PHOTO_LIST = [
+            "IMG/anh1.jpg",
+            "IMG/anh2.jpg",
+            "IMG/anh3.jpg",
+            "IMG/anh4.jpg",
+            "IMG/anh5.jpg"
+        ];
+
+        let photoSprites = [];
+        const textureLoader = new THREE.TextureLoader();
+
+        // Tạo khung ảnh Polaroid nghệ thuật có viền vàng hồng
+        function createPolaroidTexture(img) {
+            try {
+                const c = document.createElement('canvas');
+                c.width = 400;
+                c.height = 490;
+                const ctx = c.getContext('2d');
+
+                // 1. Nền giấy Polaroid trắng ngà có bóng đổ hồng
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                    ctx.roundRect(10, 10, 380, 470, 16);
+                } else {
+                    ctx.rect(10, 10, 380, 470);
+                }
+                ctx.fill();
+
+                // 2. Viền vàng hồng tinh tế
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#e2a76f';
+                ctx.stroke();
+
+                // 3. Khung chứa ảnh
+                const photoX = 25;
+                const photoY = 25;
+                const photoW = 350;
+                const photoH = 370;
+
+                ctx.save();
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                    ctx.roundRect(photoX, photoY, photoW, photoH, 8);
+                } else {
+                    ctx.rect(photoX, photoY, photoW, photoH);
+                }
+                ctx.clip();
+
+                // Cắt ảnh cover cân xứng
+                const imgRatio = img.width / img.height;
+                const boxRatio = photoW / photoH;
+                let sx = 0, sy = 0, sw = img.width, sh = img.height;
+                if (imgRatio > boxRatio) {
+                    sw = img.height * boxRatio;
+                    sx = (img.width - sw) / 2;
+                } else {
+                    sh = img.width / boxRatio;
+                    sy = (img.height - sh) / 2;
+                }
+                ctx.drawImage(img, sx, sy, sw, sh, photoX, photoY, photoW, photoH);
+                ctx.restore();
+
+                // 4. Dòng chữ chúc mừng ở đáy khung ảnh
+                ctx.font = 'bold 22px "Quicksand", sans-serif';
+                ctx.fillStyle = '#ff2a7a';
+                ctx.textAlign = 'center';
+                ctx.fillText('❤️ Happy Birthday ✨', 200, 445);
+
+                const tex = new THREE.CanvasTexture(c);
+                tex.needsUpdate = true;
+                return tex;
+            } catch (err) {
+                console.warn("Dùng texture gốc do hạn chế canvas:", err);
+                return null;
+            }
+        }
+
+        function loadLocalImage(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                // TUYỆT ĐỐI KHÔNG SET crossOrigin để trình duyệt không chặn file:// cục bộ
+                img.onload = () => resolve(img);
+                img.onerror = () => {
+                    console.warn("Không tải được ảnh:", url);
+                    resolve(null);
+                };
+                img.src = url;
+            });
+        }
+
+        async function initFloatingPhotos() {
+            // Ưu tiên nạp danh sách ảnh Base64 từ anh_data.js (chắc chắn 100% hiển thị không bao giờ bị chặn bởi bảo mật file://)
+            let sourceList = [];
+            if (window.PHOTOS_BASE64 && Array.isArray(window.PHOTOS_BASE64) && window.PHOTOS_BASE64.length > 0) {
+                sourceList = window.PHOTOS_BASE64;
+            } else {
+                sourceList = PHOTO_LIST;
+            }
+
+            for (let i = 0; i < sourceList.length; i++) {
+                const src = sourceList[i];
+                const img = await loadLocalImage(src);
+
+                let finalTexture = null;
+                if (img) {
+                    finalTexture = createPolaroidTexture(img);
+                }
+
+                // Dự phòng nếu không qua canvas được
+                if (!finalTexture) {
+                    try {
+                        finalTexture = textureLoader.load(src);
+                    } catch(e){}
+                }
+
+                if (!finalTexture) continue;
+
+                const mat = new THREE.SpriteMaterial({
+                    map: finalTexture,
+                    transparent: true,
+                    opacity: 0.98,
+                    depthWrite: false
+                });
+
+                const sprite = new THREE.Sprite(mat);
+                // Kích thước to rõ nét trong không gian
+                const scaleW = 75;
+                const scaleH = scaleW * (490 / 400);
+                sprite.scale.set(scaleW, scaleH, 1);
+
+                // Phân bố đều trong không gian quanh người xem
+                const radius = 190 + Math.random() * 200;
+                const angle = (i / sourceList.length) * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                const y = Y_MIN + (i / sourceList.length) * (Y_MAX - Y_MIN);
+
+                sprite.position.set(x, y, z);
+                scene.add(sprite);
+
+                photoSprites.push({
+                    sprite: sprite,
+                    speed: (0.85 + Math.random() * 0.3) * PHOTO_FLY_SPEED,
+                    swayDist: 15 + Math.random() * 20,
+                    baseX: x,
+                    baseZ: z,
+                    radius: radius,
+                    seed: i * 1.5
+                });
+            }
+        }
+        initFloatingPhotos();
+
+        const clock = new THREE.Clock();
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            controls.update();
+
+            starPoints.rotation.y = time * 0.018;
+
+            for (let i = 0; i < wishSprites.length; i++) {
+                const item = wishSprites[i];
+                item.sprite.position.y += item.speed;
+
+                item.sprite.position.x = item.baseX + Math.sin(time + i) * item.swayDist;
+                item.sprite.position.z = item.baseZ + Math.cos(time + i) * item.swayDist;
+
+                const y = item.sprite.position.y;
+                if (y < Y_MIN + 70) {
+                    item.sprite.material.opacity = Math.max(0, (y - Y_MIN) / 70);
+                } else if (y > Y_MAX - 70) {
+                    item.sprite.material.opacity = Math.max(0, (Y_MAX - y) / 70);
+                } else {
+                    item.sprite.material.opacity = 0.95;
+                }
+
+                if (item.sprite.position.y > Y_MAX) {
+                    item.sprite.position.y = Y_MIN;
+                    item.index = (item.index + 1) % wishes.length;
+                    const newData = makeNeonWishData(wishes[item.index]);
+                    item.sprite.material.map = newData.texture;
+                    item.sprite.scale.set(newData.scaleX, newData.scaleY, 1);
+                }
+            }
+
+            // Di chuyển các tấm ảnh Polaroid bay từ dưới lên
+            for (let i = 0; i < photoSprites.length; i++) {
+                const p = photoSprites[i];
+                p.sprite.position.y += p.speed;
+
+                p.sprite.position.x = p.baseX + Math.sin(time * 0.8 + p.seed) * p.swayDist;
+                p.sprite.position.z = p.baseZ + Math.cos(time * 0.8 + p.seed) * p.swayDist;
+
+                const py = p.sprite.position.y;
+                if (py < Y_MIN + 70) {
+                    p.sprite.material.opacity = Math.max(0, (py - Y_MIN) / 70);
+                } else if (py > Y_MAX - 70) {
+                    p.sprite.material.opacity = Math.max(0, (Y_MAX - py) / 70);
+                } else {
+                    p.sprite.material.opacity = 0.96;
+                }
+
+                if (p.sprite.position.y > Y_MAX) {
+                    p.sprite.position.y = Y_MIN;
+                    const newAngle = Math.random() * Math.PI * 2;
+                    p.baseX = Math.cos(newAngle) * p.radius;
+                    p.baseZ = Math.sin(newAngle) * p.radius;
+                }
+            }
+
+            for (let i = 0; i < heartList.length; i++) {
+                const h = heartList[i];
+                h.sprite.position.y += h.speed;
+
+                if (h.sprite.position.y > Y_MAX) {
+                    h.sprite.position.y = Y_MIN;
+                    const a = Math.random() * Math.PI * 2;
+                    h.sprite.position.x = Math.cos(a) * h.radius;
+                    h.sprite.position.z = Math.sin(a) * h.radius;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate3D();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
